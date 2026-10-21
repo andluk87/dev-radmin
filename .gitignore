@@ -2,6 +2,9 @@
 bin/*
 !bin/probe
 !bin/probe.sha256
+!bin/srp-lab
+!bin/srp-lab.sha256
+lab-record*.json
 diagnostics/
 radmin-diagnostics-*/
 radmin-capture-*/

@@ -1,4 +1,29 @@
 services:
+  srp-lab:
+    profiles: ["srp-lab"]
+    build: .
+    image: dev-radmin-probe:local
+    entrypoint: ["/srp-lab"]
+    command: ["-listen", ":17302", "-record", "/run/srp-record.json"]
+    ports: ["127.0.0.1:17302:17302/tcp"]
+    volumes:
+      - type: bind
+        source: ${SRP_LAB_RECORD:-./lab-record.json}
+        target: /run/srp-record.json
+        read_only: true
+        bind:
+          create_host_path: false
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 32
+    mem_limit: 64m
+    cpus: 0.5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
   probe:
     build: .
     image: dev-radmin-probe:local

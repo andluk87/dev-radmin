@@ -10,4 +10,6 @@ fi
 mkdir -p bin
 CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/probe ./cmd/probe
 sha256sum bin/probe > bin/probe.sha256
+CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/srp-lab ./cmd/srp-lab
+sha256sum bin/srp-lab > bin/srp-lab.sha256
 docker compose build
