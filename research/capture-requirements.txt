@@ -1,0 +1,2 @@
+dissect.etl==3.14
+dpkt==1.9.8

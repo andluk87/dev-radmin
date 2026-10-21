@@ -6,7 +6,7 @@ if ! "$go_binary" version >/dev/null 2>&1; then
   echo 'Go compiler unavailable. Set GO_BINARY to the path of a Go 1.22+ compiler.' >&2
   exit 1
 fi
-"$go_binary" test ./cmd/probe
+"$go_binary" test ./...
 mkdir -p bin
 CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/probe ./cmd/probe
 sha256sum bin/probe > bin/probe.sha256

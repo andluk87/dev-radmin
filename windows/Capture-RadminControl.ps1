@@ -31,8 +31,9 @@ if (-not [Net.IPAddress]::TryParse($ServerAddress,[ref]$parsedAddress) -or $pars
 $ServerAddress = $parsedAddress.ToString()
 $netsh = Join-Path $env:SystemRoot 'System32\netsh.exe'
 $help = & $netsh trace show capturefilterhelp 2>&1
-if ($LASTEXITCODE -ne 0 -or ($help -join "`n") -notmatch 'IPv4\.Address') {
-    throw 'This Windows build does not expose the required IPv4.Address capture filter.'
+$filterHelp = $help -join "`n"
+if ($LASTEXITCODE -ne 0 -or $filterHelp -notmatch 'IPv4\.Address' -or $filterHelp -notmatch 'Ethernet\.Type' -or $filterHelp -notmatch 'Protocol=') {
+    throw 'This Windows build does not expose the required IPv4/Ethernet/protocol capture filters.'
 }
 New-Item -ItemType Directory -Path $OutputDirectory -ErrorAction Stop | Out-Null
 $OutputDirectory = (Resolve-Path -LiteralPath $OutputDirectory).Path
@@ -40,13 +41,14 @@ $etl = Join-Path $OutputDirectory 'radmin-control.etl'
 $pcap = Join-Path $OutputDirectory 'radmin-control.pcapng'
 $log = Join-Path $OutputDirectory 'capture-log.txt'
 $help | Out-File -LiteralPath (Join-Path $OutputDirectory 'capture-filter-help.txt') -Encoding UTF8
-$started = $false; $stopped = $false; $restarted = $false; $failure = $null
+$started = $false; $stopped = $false; $restarted = $false; $failure = $null; $stopExitCode = $null
 $startTime = [DateTime]::UtcNow
 Write-Host ('Recording packets to/from control server ' + $ServerAddress + ' for ' + $Seconds + ' seconds.')
 if ($RestartService) { Write-Host 'RvControlSvc will restart once. Existing Radmin VPN connections will briefly disconnect.' }
 try {
     $arguments = @('trace','start','capture=yes','report=no','persistent=no','correlation=no',
-        'maxsize=16','filemode=single','overwrite=no',('tracefile=' + $etl),('IPv4.Address=' + $ServerAddress))
+        'maxsize=16','filemode=single','overwrite=no',('tracefile=' + $etl),
+        'Ethernet.Type=IPv4','Protocol=TCP',('IPv4.Address=' + $ServerAddress))
     & $netsh @arguments 2>&1 | Out-File -LiteralPath $log -Encoding UTF8
     if ($LASTEXITCODE -ne 0) { throw 'netsh trace start failed. An existing trace was not stopped. See capture-log.txt.' }
     if (-not (Test-Path -LiteralPath $etl -PathType Leaf)) {
@@ -65,20 +67,25 @@ try {
 finally {
     if ($started) {
         & $netsh trace stop 2>&1 | Out-File -LiteralPath $log -Append -Encoding UTF8
-        $stopped = ($LASTEXITCODE -eq 0)
-        if (-not $stopped) { Write-Warning 'Trace stop failed. Run netsh trace stop in the same elevated terminal.' }
+        $stopExitCode = $LASTEXITCODE
+        $stopped = ($stopExitCode -eq 0)
+        if (-not $stopped) {
+            & $netsh trace show status 2>&1 | Out-File -LiteralPath $log -Append -Encoding UTF8
+            Write-Warning 'Stop returned a nonzero status; tracing may already have ended at its size limit. The ETL is retained and conversion will be attempted. See capture-log.txt for trace status.'
+        }
     }
     $metadata = [ordered]@{
-        SchemaVersion=1;StartedAtUtc=$startTime.ToString('o');FinishedAtUtc=[DateTime]::UtcNow.ToString('o')
-        Filter=('IPv4.Address=' + $ServerAddress);ExpectedControlTCPPort=17301
+        SchemaVersion=2;StartedAtUtc=$startTime.ToString('o');FinishedAtUtc=[DateTime]::UtcNow.ToString('o')
+        Filter=@('Ethernet.Type=IPv4','Protocol=TCP',('IPv4.Address=' + $ServerAddress));ExpectedControlTCPPort=17301
         RequestedSeconds=$Seconds;TraceStarted=$started;TraceStopped=$stopped
+        StopExitCode=$stopExitCode
         RestartRequested=[bool]$RestartService;RestartCompleted=$restarted
         Failure=$failure;ETLExists=(Test-Path -LiteralPath $etl -PathType Leaf)
     }
     $metadata | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'capture-metadata.json') -Encoding UTF8
 }
 if ($failure) { throw $failure }
-if (-not $stopped -or -not (Test-Path -LiteralPath $etl -PathType Leaf)) { throw 'A completed ETL capture is unavailable. See capture-log.txt.' }
+if (-not (Test-Path -LiteralPath $etl -PathType Leaf)) { throw 'An ETL capture file is unavailable. See capture-log.txt.' }
 if (-not $SkipConversion) {
     # Official Microsoft release, pinned by the SHA-256 of the HTTPS-downloaded release artifact.
     $converterUrl = 'https://github.com/microsoft/etl2pcapng/releases/download/v1.11.0/etl2pcapng.exe'
