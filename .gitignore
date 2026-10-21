@@ -4,4 +4,8 @@ bin/*
 !bin/probe.sha256
 diagnostics/
 radmin-diagnostics-*/
+radmin-capture-*/
+*.etl
+*.pcap
+*.pcapng
 __pycache__/
