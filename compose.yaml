@@ -1,0 +1,24 @@
+services:
+  probe:
+    build: .
+    image: dev-radmin-probe:local
+    command: ["-listen", ":4899", "-health", "127.0.0.1:8080"]
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PROBE_PORT:-4899}:4899/tcp"
+      - "${BIND_ADDRESS:-127.0.0.1}:${PROBE_PORT:-4899}:4899/udp"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 32
+    mem_limit: 64m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "/probe", "-healthcheck"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
