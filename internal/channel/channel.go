@@ -17,8 +17,28 @@ const MaxPayload = 1 << 20
 var ErrRecord = errors.New("invalid legacy channel record or failed channel")
 
 type Channel struct {
-	enc, dec cipher.BlockMode
-	failed   bool
+	enc, dec     cipher.BlockMode
+	encIV, decIV [16]byte
+	failed       bool
+}
+
+// Rekey preserves both CBC chains, as the helper's SetKeyEnc/SetKeyDec do.
+// It is only valid after successful SRP proof verification by the caller.
+func (c *Channel) Rekey(encKey, decKey []byte) error {
+	if c.failed || len(encKey) != 32 || len(decKey) != 32 {
+		return ErrRecord
+	}
+	enc, err := aes.NewCipher(encKey)
+	if err != nil {
+		return err
+	}
+	dec, err := aes.NewCipher(decKey)
+	if err != nil {
+		return err
+	}
+	c.enc = cipher.NewCBCEncrypter(enc, c.encIV[:])
+	c.dec = cipher.NewCBCDecrypter(dec, c.decIV[:])
+	return nil
 }
 
 // New requires independent 32-byte directional keys. Both IVs start at zero.
@@ -51,6 +71,7 @@ func (c *Channel) Encrypt(payload []byte) ([]byte, error) {
 	copy(out[size-9:], check[:])
 	out[size-1] = byte(size - len(payload))
 	c.enc.CryptBlocks(out, out)
+	copy(c.encIV[:], out[len(out)-16:])
 	return out, nil
 }
 
@@ -68,6 +89,7 @@ func (c *Channel) Decrypt(record []byte) ([]byte, error) {
 		}
 	}()
 	c.dec.CryptBlocks(plain, plain)
+	copy(c.decIV[:], record[len(record)-16:])
 	padding := int(plain[len(plain)-1])
 	if padding < 9 || padding >= 25 || padding >= len(plain) {
 		return reject()

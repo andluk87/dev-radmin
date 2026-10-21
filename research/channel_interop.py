@@ -54,6 +54,14 @@ class NativeChannel:
         r.call("SHelper_FreeBuffer", ptr)
         return result
 
+    def rekey(self, enc, dec):
+        for name, key in (
+            ("SHelper_CChannel_SetKeyEnc", enc),
+            ("SHelper_CChannel_SetKeyDec", dec),
+        ):
+            if self.r.call(name, self.handle, self.r.data(key), len(key)) != 1:
+                raise RuntimeError("native channel rekey failed")
+
     def close(self):
         self.r.call("SHelper_CChannel_Delete", self.handle)
 
@@ -76,6 +84,24 @@ def vectors(native):
                     {"plaintext_hex": plain.hex(), "ciphertext_hex": encrypted.hex()}
                 )
             streams.append({"direction": direction, "messages": messages})
+        rekey_key = bytes((i * 11 + 3) % 256 for i in range(32))
+        client.rekey(rekey_key, rekey_key)
+        server.rekey(rekey_key, rekey_key)
+        rekey_streams = []
+        for sender, receiver, direction in [
+            (client, server, "client_to_server"),
+            (server, client, "server_to_client"),
+        ]:
+            messages = []
+            for length in (7, 32, 289):
+                plain = bytes((i * 13 + length) % 256 for i in range(length))
+                encrypted = sender.transform(plain)
+                if receiver.transform(encrypted, False) != plain:
+                    raise RuntimeError("native rekey roundtrip failed")
+                messages.append(
+                    {"plaintext_hex": plain.hex(), "ciphertext_hex": encrypted.hex()}
+                )
+            rekey_streams.append({"direction": direction, "messages": messages})
     finally:
         client.close()
         server.close()
@@ -97,6 +123,8 @@ def vectors(native):
         "client_key_hex": CLIENT_KEY.hex(),
         "server_key_hex": SERVER_KEY.hex(),
         "streams": streams,
+        "rekey_key_hex": rekey_key.hex(),
+        "rekey_streams": rekey_streams,
     }
 
 
@@ -185,6 +213,9 @@ def main():
         "vpn_ready": False,
     }
     fixture = vectors(native)
+    report["native_rekey_roundtrips"] = sum(
+        len(s["messages"]) for s in fixture["rekey_streams"]
+    )
     report["native_roundtrips"] = sum(len(s["messages"]) for s in fixture["streams"])
     if args.write_vectors:
         write_new(args.write_vectors, fixture)

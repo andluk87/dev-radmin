@@ -14,3 +14,8 @@ radmin-capture-*/
 *.pcapng
 __pycache__/
 lab-rsa-*.pem
+*.dll
+*.exe
+!bin/native-check-windows-386.exe
+!bin/native-check-windows-386.exe.sha256
+radmin-native-check-*/

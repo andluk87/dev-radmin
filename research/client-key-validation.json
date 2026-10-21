@@ -1,0 +1,13 @@
+{
+  "synthetic_only": true,
+  "original_unchanged": true,
+  "code_sections_unchanged": true,
+  "pe_checksum_valid": true,
+  "replacement_key_matches": true,
+  "native_helper_accepts_exact_embedded_key_encoding": true,
+  "native_rsa_request_bytes": 192,
+  "decrypted_plaintext_bytes": 76,
+  "modified_executable_installed": false,
+  "modified_executable_executed": false,
+  "vendor_signature_valid_after_modification": false
+}

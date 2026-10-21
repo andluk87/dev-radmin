@@ -8,18 +8,21 @@ import (
 	"testing"
 )
 
+type stream struct {
+	Direction string `json:"direction"`
+	Messages  []struct {
+		Plain  string `json:"plaintext_hex"`
+		Cipher string `json:"ciphertext_hex"`
+	} `json:"messages"`
+}
 type fixture struct {
 	Rejected      []string `json:"rejected_records_hex"`
 	SyntheticOnly bool     `json:"synthetic_only"`
 	ClientKey     string   `json:"client_key_hex"`
 	ServerKey     string   `json:"server_key_hex"`
-	Streams       []struct {
-		Direction string `json:"direction"`
-		Messages  []struct {
-			Plain  string `json:"plaintext_hex"`
-			Cipher string `json:"ciphertext_hex"`
-		} `json:"messages"`
-	} `json:"streams"`
+	Streams       []stream `json:"streams"`
+	RekeyKey      string   `json:"rekey_key_hex"`
+	RekeyStreams  []stream `json:"rekey_streams"`
 }
 
 func unhex(t *testing.T, s string) []byte {
@@ -55,27 +58,44 @@ func TestSequentialRecordsMatchNativeBothDirections(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, stream := range f.Streams {
-		sender, receiver := client, server
-		if stream.Direction == "server_to_client" {
-			sender, receiver = server, client
-		}
-		if len(stream.Messages) != 13 {
-			t.Fatal("missing boundary cases")
-		}
-		for _, m := range stream.Messages {
-			plain, want := unhex(t, m.Plain), unhex(t, m.Cipher)
-			got, e := sender.Encrypt(plain)
-			if e != nil || !bytes.Equal(got, want) {
-				t.Fatalf("native encryption mismatch len=%d err=%v", len(plain), e)
+	for phase, streams := range [][]stream{f.Streams, f.RekeyStreams} {
+		expected := 13
+		if phase == 1 {
+			expected = 3
+			if len(streams) != 2 {
+				t.Fatal("missing native rekey vectors")
 			}
-			back, e := receiver.Decrypt(want)
-			if e != nil || !bytes.Equal(back, plain) {
-				t.Fatalf("native decryption mismatch len=%d err=%v", len(plain), e)
+			key := unhex(t, f.RekeyKey)
+			if e := client.Rekey(key, key); e != nil {
+				t.Fatal(e)
+			}
+			if e := server.Rekey(key, key); e != nil {
+				t.Fatal(e)
+			}
+		}
+		for _, stream := range streams {
+			sender, receiver := client, server
+			if stream.Direction == "server_to_client" {
+				sender, receiver = server, client
+			}
+			if len(stream.Messages) != expected {
+				t.Fatal("missing boundary cases")
+			}
+			for _, m := range stream.Messages {
+				plain, want := unhex(t, m.Plain), unhex(t, m.Cipher)
+				got, e := sender.Encrypt(plain)
+				if e != nil || !bytes.Equal(got, want) {
+					t.Fatalf("native encryption mismatch len=%d err=%v", len(plain), e)
+				}
+				back, e := receiver.Decrypt(want)
+				if e != nil || !bytes.Equal(back, plain) {
+					t.Fatalf("native decryption mismatch len=%d err=%v", len(plain), e)
+				}
 			}
 		}
 	}
 }
+
 func TestMD4EightByteReferenceValues(t *testing.T) {
 	// Independently checked with OpenSSL's legacy MD4 provider.
 	for _, v := range []struct {
@@ -108,6 +128,9 @@ func TestCorruptionAndOutOfOrderInvalidateChannel(t *testing.T) {
 		}
 		if plain, e := receiver.Decrypt(first); e == nil || plain != nil {
 			t.Fatal("failed channel was reusable")
+		}
+		if e := receiver.Rekey(unhex(t, f.ServerKey), unhex(t, f.ClientKey)); e == nil {
+			t.Fatal("failed channel accepted rekey")
 		}
 	}
 }

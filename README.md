@@ -14,6 +14,21 @@
 Результаты и точные адреса функций: [research/findings.md](research/findings.md).
 Исходные EXE/DLL и установщик в репозиторий не включаются.
 
+## Следующий тест на Windows
+
+Подготовлена [проверка исходной DLL и смены ключа после SRP](research/windows-native-check.md).
+Она не меняет установленный Radmin VPN и не требует Git/Docker на Windows.
+Нужен результат её первого запуска на настоящей Windows — `native-check.json`.
+
+```powershell
+Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/andluk87/dev-radmin/main/windows/Run-RadminNativeCheck.ps1' -OutFile .\Run-RadminNativeCheck.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Run-RadminNativeCheck.ps1
+```
+
+Также найден [встроенный публичный RSA-ключ службы](research/client-key-findings.md)
+и подготовлен инструмент для офлайн-копии с собственным ключом. Такая копия теряет
+валидность подписи изготовителя; на Windows она не устанавливалась и не запускалась.
+
 ## Скачать с GitHub и запустить
 
 На Windows с установленным Git:

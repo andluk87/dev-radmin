@@ -106,3 +106,10 @@ docker rm -f dev-radmin-channel-lab
 после клиентских 4 и 192 байт; 256 байт — уже следующий ответ. Добавлена
 [полная начальная цепочка RSA → CChannel → SRP на Go](bootstrap-findings.md),
 проверенная через Docker на собственном RSA-ключе.
+
+## Дополнение: смена ключа
+
+Добавлены шесть нативных векторов после смены ключа с сохранением IV и метод
+Go `Rekey`. Связь перехода с завершением SRP описана в
+[client-key-findings.md](client-key-findings.md). Для первого запуска на настоящей
+Windows подготовлен [отдельный native-check](windows-native-check.md).

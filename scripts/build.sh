@@ -12,4 +12,7 @@ CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/probe ./cmd/probe
 sha256sum bin/probe > bin/probe.sha256
 CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/srp-lab ./cmd/srp-lab
 sha256sum bin/srp-lab > bin/srp-lab.sha256
+GOOS=windows GOARCH=386 "$go_binary" vet ./cmd/native-check
+GOOS=windows GOARCH=386 CGO_ENABLED=0 "$go_binary" build -trimpath -o bin/native-check-windows-386.exe ./cmd/native-check
+sha256sum bin/native-check-windows-386.exe > bin/native-check-windows-386.exe.sha256
 docker compose build
