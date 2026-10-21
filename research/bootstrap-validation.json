@@ -1,0 +1,91 @@
+{
+  "scope": "Native helper RSA/CChannel/SRP with own lab key; whole Windows app not tested",
+  "rsa_bits": 1536,
+  "preamble_client_body_lengths": [
+    4,
+    192
+  ],
+  "preamble_server_body_lengths": [
+    4
+  ],
+  "vpn_ready": false,
+  "cases": [
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ]
+    },
+    {
+      "case": "wrong-password",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ]
+    },
+    {
+      "case": "tampered-proof",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ]
+    },
+    {
+      "case": "tampered-channel",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ]
+    }
+  ]
+}
