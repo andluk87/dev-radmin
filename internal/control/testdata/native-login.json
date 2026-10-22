@@ -1,0 +1,28 @@
+{
+  "synthetic_only": true,
+  "dll_sha256": "6ba7dfecd38183d4bff0fc53f1c8c05d25e636077fe753b1220912aa58938177",
+  "scope": "Original packet factory with memory and UTF-8/UTF-16 shims; no full session state or Windows execution",
+  "cases": [
+    {
+      "kind": "modern_login",
+      "input_hex": "00000004010003200000001500000004010001f10000004b000000040100025b0000000100000012000013430000000a0e0003703132372e302e302e310000000012000013400000000a0e00036c3132372e302e302e3100",
+      "accepted": true,
+      "packet_type": 21,
+      "allocation_calls": 6,
+      "version": 75,
+      "field_0100025b": 1,
+      "list_1343_count": 1,
+      "list_1340_count": 1,
+      "unicode_calls": 4
+    },
+    {
+      "kind": "registered",
+      "input_hex": "000000040100032000000008000000100000123300000008020001e1000000000000002a",
+      "accepted": true,
+      "packet_type": 8,
+      "allocation_calls": 3,
+      "user_id": 42,
+      "unicode_calls": 4
+    }
+  ]
+}

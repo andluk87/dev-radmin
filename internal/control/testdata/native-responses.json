@@ -1,0 +1,86 @@
+{
+  "synthetic_only": true,
+  "dll_sha256": "6ba7dfecd38183d4bff0fc53f1c8c05d25e636077fe753b1220912aa58938177",
+  "scope": "Selected original decoders plus actual Error/IsAlive packet factory; memory allocation shims for factory and serializer; no full client state or Windows execution",
+  "mode": 4,
+  "factory_va": "0x1008a790",
+  "cases": [
+    {
+      "kind": "error",
+      "input_hex": "0000000401000320000000100000000c0000123b00000004010001d200000001",
+      "accepted": true,
+      "code": 1
+    },
+    {
+      "kind": "error",
+      "input_hex": "0000000401000320000000100000000c0000123b00000004010001d200000007",
+      "accepted": true,
+      "code": 7
+    },
+    {
+      "kind": "error",
+      "input_hex": "0000000401000320000000100000000c0000123b00000004010001d100000001",
+      "accepted": false
+    },
+    {
+      "kind": "error",
+      "input_hex": "000000040100032000000010000000090000123b00000001010001d201",
+      "accepted": false
+    },
+    {
+      "kind": "error",
+      "input_hex": "00000004010003200000001000000004010001d200000001",
+      "accepted": false
+    },
+    {
+      "kind": "is_alive",
+      "input_hex": "000000040100032000000012000000100000126700000008020002321122334455667788",
+      "accepted": true,
+      "nonce": 1234605616436508552
+    },
+    {
+      "kind": "is_alive",
+      "input_hex": "0000000401000320000000120000000c00001267000000040200023200000001",
+      "accepted": false
+    },
+    {
+      "kind": "login_complete",
+      "input_hex": "00000004010003200000001500000004010001f100000010000000040100025b00000001",
+      "accepted": true,
+      "version": 16,
+      "field_0100025b": 1
+    },
+    {
+      "kind": "login_complete",
+      "input_hex": "00000004010003200000001500000004010001f10000004b000000040100025b00000001",
+      "accepted": false
+    }
+  ],
+  "factory": [
+    {
+      "input_hex": "0000000401000320000000100000000c0000123b00000004010001d200000001",
+      "accepted": true,
+      "packet_type": 16,
+      "allocation_calls": 2,
+      "code": 1
+    },
+    {
+      "input_hex": "0000000401000320000000100000000c0000123b00000004010001d200000007",
+      "accepted": true,
+      "packet_type": 16,
+      "allocation_calls": 2,
+      "code": 7
+    },
+    {
+      "input_hex": "000000040100032000000012000000100000126700000008020002321122334455667788",
+      "accepted": true,
+      "packet_type": 18,
+      "allocation_calls": 2,
+      "nonce": 1234605616436508552
+    }
+  ],
+  "is_alive_reply": {
+    "nonce": 1234605616436508552,
+    "encoded_hex": "000000240000123c00000004010001d40000001b000000100000126700000008020002321122334455667788"
+  }
+}

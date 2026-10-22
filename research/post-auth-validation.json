@@ -1,0 +1,177 @@
+{
+  "vpn_ready": false,
+  "cases": [
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": false
+    },
+    {
+      "case": "wrong-password",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": false
+    },
+    {
+      "case": "tampered-proof",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": false
+    },
+    {
+      "case": "tampered-channel",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": false
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": true,
+      "echo_enabled": true
+    },
+    {
+      "case": "wrong-password",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": true
+    },
+    {
+      "case": "tampered-proof",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": true
+    },
+    {
+      "case": "tampered-channel",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "echo_enabled": true
+    }
+  ],
+  "scope": "Original pinned shelper.dll in bounded Linux emulator against Go TCP server; synthetic own-key RSA/CChannel/SRP and optional post-auth echo. Windows not tested.",
+  "dll_sha256": "d89daf6bcd5cafa3c7f6173f835ccf045baf8e7134f868819db6fd7615959ac4"
+}

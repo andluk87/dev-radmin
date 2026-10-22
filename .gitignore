@@ -19,3 +19,10 @@ lab-rsa-*.pem
 !bin/native-check-windows-386.exe
 !bin/native-check-windows-386.exe.sha256
 radmin-native-check-*/
+
+# Local intermediate files and synthetic experiment keys.
+work/
+
+# Decrypted deployment credentials must remain local.
+server/config/
+server/.config.setup.*/

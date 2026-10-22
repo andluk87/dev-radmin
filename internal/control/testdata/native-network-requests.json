@@ -1,0 +1,51 @@
+{
+  "synthetic_only": true,
+  "dll_sha256": "6ba7dfecd38183d4bff0fc53f1c8c05d25e636077fe753b1220912aa58938177",
+  "scope": "Original network request serializers only. Password cryptography and server operation semantics not tested.",
+  "cases": [
+    {
+      "case": "join-synthetic-proof",
+      "command": 39,
+      "parameter": 0,
+      "request_hex": "000000040100031f000000270000001f0000131c000000170a00030e73796e7468657469632d6e6574776f726b2d70726f6f66"
+    },
+    {
+      "case": "join-synthetic-proof",
+      "command": 39,
+      "parameter": 7,
+      "request_hex": "000000040100031f000000270000002b0000131c000000170a00030e73796e7468657469632d6e6574776f726b2d70726f6f6600000004010003be00000007"
+    },
+    {
+      "case": "join-empty-password-material",
+      "command": 39,
+      "network_name": "synthetic-network",
+      "hidden": false,
+      "parameter3": 0,
+      "parameter4": 0,
+      "parameter5": 0,
+      "request_hex": "000000040100031f00000027000000380000131c000000240300030600730079006e007400680065007400690063002d006e006500740077006f0072006b0001000000040b00033f00000000"
+    },
+    {
+      "case": "join-empty-password-material",
+      "command": 39,
+      "network_name": "Тестовая сеть",
+      "hidden": true,
+      "parameter3": 123,
+      "parameter4": 4,
+      "parameter5": 7,
+      "request_hex": "000000040100031f00000027000000580000131c0000001c030003060422043504410442043e04320430044f0020044104350442044c0001000000040b00033f000000010000000802000340000000000000007b000000040100034a0000000400000004010003be00000007"
+    },
+    {
+      "case": "manage-opaque-operation",
+      "command": 52,
+      "operation_hex": "73796e7468657469632d6f7065726174696f6e",
+      "request_hex": "000000040100031f00000034000000130000131973796e7468657469632d6f7065726174696f6e"
+    },
+    {
+      "case": "manage-opaque-operation",
+      "command": 52,
+      "operation_hex": "000000040100031f00000001",
+      "request_hex": "000000040100031f000000340000000c00001319000000040100031f00000001"
+    }
+  ]
+}

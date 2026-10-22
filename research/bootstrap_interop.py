@@ -83,6 +83,7 @@ def main():
     parser.add_argument("--mapping", type=Path, required=True)
     parser.add_argument("--public-key", type=Path, required=True)
     parser.add_argument("--server-address", required=True)
+    parser.add_argument("--post-auth-echo", action="store_true", help="test a server started with -post-auth-echo")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     key = load_pem_public_key(args.public_key.read_bytes())
@@ -104,6 +105,7 @@ def main():
             args.server_address,
             case,
             bootstrap=lambda connection: bootstrap(native, connection, public),
+            post_auth_echo=args.post_auth_echo,
         )
         report["cases"].append(result)
         print("PASS RSA/channel/SRP", case, flush=True)

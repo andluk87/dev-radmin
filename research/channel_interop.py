@@ -128,12 +128,13 @@ def vectors(native):
     }
 
 
-def encrypted_srp(native, address, case, bootstrap=None):
+def encrypted_srp(native, address, case, bootstrap=None, post_auth_echo=False, post_auth_check=None):
     channel = None if bootstrap else NativeChannel(native)
     password = b"wrong-research-password" if case == "wrong-password" else PASSWORD
     client = native.client(password=password)
     host, port = address.rsplit(":", 1)
     rejected, complete = False, 0
+    post_auth_result = None
     trace = []
     try:
         with socket.create_connection((host, int(port)), timeout=5) as connection:
@@ -178,6 +179,27 @@ def encrypted_srp(native, address, case, bootstrap=None):
                     or len(native.key(client)) != 40
                 ):
                     raise RuntimeError("native client did not authenticate")
+                if post_auth_echo:
+                    key = native.key(client)
+                    channel.rekey(key[:32], key[:32])
+                    del key
+                    payload = b"synthetic post-SRP echo; no VPN command"
+                    outgoing = channel.transform(payload)
+                    connection.sendall(struct.pack(">I", len(outgoing)) + outgoing)
+                    size = struct.unpack(">I", exact(connection, 4))[0]
+                    if not 0 < size <= 4096:
+                        raise RuntimeError("invalid post-auth frame length")
+                    if channel.transform(exact(connection, size), False) != payload:
+                        raise RuntimeError("post-auth echo mismatch")
+                    if connection.recv(1) != b"":
+                        raise RuntimeError("unexpected extra post-auth data")
+                if post_auth_check:
+                    if post_auth_echo:
+                        raise RuntimeError("post-auth checks are mutually exclusive")
+                    key = native.key(client)
+                    channel.rekey(key[:32], key[:32])
+                    del key
+                    post_auth_result = post_auth_check(connection, channel)
         passed = (
             (complete == 1 and not rejected)
             if case == "correct"
@@ -191,6 +213,8 @@ def encrypted_srp(native, address, case, bootstrap=None):
             "authenticated": complete == 1,
             "server_rejected": rejected,
             "encrypted_trace": trace,
+            "post_auth_echo": post_auth_echo and complete == 1,
+            "post_auth_check": post_auth_result,
         }
     finally:
         if channel:

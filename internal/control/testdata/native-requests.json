@@ -1,0 +1,108 @@
+{
+  "synthetic_only": true,
+  "dll_sha256": "6ba7dfecd38183d4bff0fc53f1c8c05d25e636077fe753b1220912aa58938177",
+  "scope": "Original command-20 constructor, setters and virtual serializer with modeled malloc/realloc/free and Get/SetLastError; not full Windows app",
+  "cases": [
+    {
+      "mode": 4,
+      "setter_results": [
+        {
+          "setter": "field_1286",
+          "accepted": true
+        },
+        {
+          "setter": "field_122f",
+          "accepted": true
+        },
+        {
+          "setter": "field_1331",
+          "accepted": true
+        },
+        {
+          "setter": "field_010003e0",
+          "accepted": true
+        },
+        {
+          "setter": "field_0b000342",
+          "accepted": true
+        },
+        {
+          "setter": "field_01000343",
+          "accepted": true
+        }
+      ],
+      "request_hex": "000000040100031f00000014000000160000128673796e7468657469632d6d616368696e652d64617461000000150000122f73796e7468657469632d636c69656e742d64617461000000160000133173796e7468657469632d6d616368696e652d6461746100000004010003e000000003000000040b0003420000000100000004010003430000002a",
+      "context_tag": "0x1232"
+    },
+    {
+      "mode": 5,
+      "setter_results": [
+        {
+          "setter": "field_1286",
+          "accepted": true
+        },
+        {
+          "setter": "field_122f",
+          "accepted": true
+        },
+        {
+          "setter": "field_1331",
+          "accepted": true
+        },
+        {
+          "setter": "field_010003e0",
+          "accepted": true
+        },
+        {
+          "setter": "field_0b000342",
+          "accepted": true
+        },
+        {
+          "setter": "field_01000343",
+          "accepted": true
+        },
+        {
+          "setter": "field_0200030b_repeated",
+          "accepted": true
+        }
+      ],
+      "request_hex": "000000040100031f00000014000000160000128673796e7468657469632d6d616368696e652d64617461000000150000122f73796e7468657469632d636c69656e742d6461746100000004010003e00000000300000004010003430000002a000000080200030b000000000000007b",
+      "context_tag": "0x1232"
+    },
+    {
+      "mode": 9,
+      "setter_results": [
+        {
+          "setter": "field_1286",
+          "accepted": true
+        },
+        {
+          "setter": "field_122f",
+          "accepted": true
+        },
+        {
+          "setter": "field_1331",
+          "accepted": true
+        },
+        {
+          "setter": "field_010003e0",
+          "accepted": true
+        },
+        {
+          "setter": "field_0b000342",
+          "accepted": true
+        },
+        {
+          "setter": "field_01000343",
+          "accepted": true
+        },
+        {
+          "setter": "field_1319",
+          "accepted": true
+        }
+      ],
+      "request_hex": "000000040100031f00000014000000160000128673796e7468657469632d6d616368696e652d64617461000000150000122f73796e7468657469632d636c69656e742d6461746100000004010003e000000003000000150000131973796e7468657469632d636c69656e742d64617461",
+      "context_tag": "0x1232"
+    }
+  ]
+}

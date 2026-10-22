@@ -1,0 +1,773 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "vpn_ready": false,
+  "environment": "Original pinned helper instructions in Linux Unicorn emulator; not Windows",
+  "scope": "Go TCP RSA/CChannel/SRP, rekey/echo, native command20/39/52 error replies and IsAlive; no complete VPN login or data plane",
+  "cases": [
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": false,
+      "server_event": "authentication_complete"
+    },
+    {
+      "case": "wrong-password",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": false,
+      "server_event": "rejected"
+    },
+    {
+      "case": "tampered-proof",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": false,
+      "server_event": "rejected"
+    },
+    {
+      "case": "tampered-channel",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": false,
+      "server_event": "rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": true,
+      "post_auth_check": null,
+      "echo_enabled": true,
+      "server_event": "post_auth_echo_complete"
+    },
+    {
+      "case": "wrong-password",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": true,
+      "server_event": "rejected"
+    },
+    {
+      "case": "tampered-proof",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": true,
+      "server_event": "rejected"
+    },
+    {
+      "case": "tampered-channel",
+      "passed": true,
+      "authenticated": false,
+      "server_rejected": true,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": null,
+      "echo_enabled": true,
+      "server_event": "rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 20,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 20,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 5,
+      "command": 20,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 5,
+      "command": 20,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 9,
+      "command": 20,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 9,
+      "command": 20,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 39,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 52,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 52,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "packet_type": 16,
+        "error_code": 1,
+        "native_factory_verified": true
+      },
+      "control_mode": 4,
+      "command": 52,
+      "malformed_control": false,
+      "server_event": "control_error_sent"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "malformed_request_rejected": true
+      },
+      "control_mode": 4,
+      "command": 52,
+      "malformed_control": true,
+      "server_event": "control_rejected"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "native_factory_verified": true,
+        "native_reply_serializer_verified": true,
+        "wrong_nonce": false
+      },
+      "keepalive": true,
+      "server_event": "keepalive_complete"
+    },
+    {
+      "case": "correct",
+      "passed": true,
+      "authenticated": true,
+      "server_rejected": false,
+      "encrypted_trace": [
+        {
+          "client_body_bytes": 32,
+          "server_body_bytes": 256
+        },
+        {
+          "client_body_bytes": 224,
+          "server_body_bytes": 224
+        },
+        {
+          "client_body_bytes": 48,
+          "server_body_bytes": 48
+        }
+      ],
+      "post_auth_echo": false,
+      "post_auth_check": {
+        "native_factory_verified": true,
+        "native_reply_serializer_verified": true,
+        "wrong_nonce": true
+      },
+      "keepalive": true,
+      "server_event": "keepalive_rejected"
+    }
+  ]
+}

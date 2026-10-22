@@ -1,0 +1,78 @@
+{
+  "synthetic_only": true,
+  "dll_sha256": "6ba7dfecd38183d4bff0fc53f1c8c05d25e636077fe753b1220912aa58938177",
+  "scope": "Original TLV reader and header writer; no Windows initialization or full control protocol",
+  "reader_va": "0x100e6090",
+  "writer_va": "0x100e6030",
+  "cases": [
+    {
+      "input_hex": "000000040100031f00000014",
+      "accepted": true,
+      "consumed": 12,
+      "tag": 16778015,
+      "value_hex": "00000014"
+    },
+    {
+      "input_hex": "0000000c00001232000000040100031f00000014",
+      "accepted": true,
+      "consumed": 20,
+      "tag": 4658,
+      "value_hex": "000000040100031f00000014"
+    },
+    {
+      "input_hex": "000000030a000257616263",
+      "accepted": true,
+      "consumed": 11,
+      "tag": 167772759,
+      "value_hex": "616263"
+    },
+    {
+      "input_hex": "",
+      "accepted": false
+    },
+    {
+      "input_hex": "00000004",
+      "accepted": false
+    },
+    {
+      "input_hex": "00000004010003",
+      "accepted": false
+    },
+    {
+      "input_hex": "000000040100031f000000",
+      "accepted": false
+    },
+    {
+      "input_hex": "0000000000001232",
+      "accepted": false
+    },
+    {
+      "input_hex": "ffffffff00001232",
+      "accepted": false
+    },
+    {
+      "input_hex": "000000040100031f00000014747261696c696e67",
+      "accepted": true,
+      "consumed": 12,
+      "tag": 16778015,
+      "value_hex": "00000014"
+    }
+  ],
+  "encoded": [
+    {
+      "tag": 16778015,
+      "value_hex": "00000014",
+      "encoded_hex": "000000040100031f00000014"
+    },
+    {
+      "tag": 4658,
+      "value_hex": "000000040100031f00000014",
+      "encoded_hex": "0000000c00001232000000040100031f00000014"
+    },
+    {
+      "tag": 167772759,
+      "value_hex": "73796e746865746963",
+      "encoded_hex": "000000090a00025773796e746865746963"
+    }
+  ]
+}

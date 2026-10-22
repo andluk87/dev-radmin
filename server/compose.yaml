@@ -1,0 +1,33 @@
+services:
+  control:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    image: dev-radmin-control:git
+    user: "${SERVER_UID:-1000}:${SERVER_GID:-1000}"
+    command: ["-listen", ":17301", "-record", "/run/srp-record.json", "-rsa-key", "/run/rsa-key.pem", "-post-auth-login", "${LAB_ENDPOINT:-127.0.0.1}"]
+    ports: ["${BIND_ADDRESS:-127.0.0.1}:${CONTROL_PORT:-17301}:17301/tcp"]
+    volumes:
+      - type: bind
+        source: ./config/srp-record.json
+        target: /run/srp-record.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./config/rsa-key.pem
+        target: /run/rsa-key.pem
+        read_only: true
+        bind:
+          create_host_path: false
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 32
+    mem_limit: 128m
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
