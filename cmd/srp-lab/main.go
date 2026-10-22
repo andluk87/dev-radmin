@@ -22,14 +22,18 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
+
+var connectionSequence atomic.Uint64
 
 func event(name string, extra map[string]any) {
 	if extra == nil {
 		extra = make(map[string]any)
 	}
+	extra["time_utc"] = time.Now().UTC().Format(time.RFC3339Nano)
 	extra["event"] = name
 	extra["vpn_ready"] = false
 	_ = json.NewEncoder(os.Stdout).Encode(extra)
@@ -44,66 +48,57 @@ type postAuthOptions struct {
 
 func serve(c net.Conn, record srp.Record, encKey, decKey []byte, rsaKey *rsa.PrivateKey, postAuth postAuthOptions) {
 	defer c.Close()
+	connectionID := connectionSequence.Add(1)
+	connectionEvent := func(name string, extra map[string]any) {
+		if extra == nil {
+			extra = make(map[string]any)
+		}
+		extra["connection_id"] = connectionID
+		event(name, extra)
+	}
+	connectionEvent("connection_open", nil)
 	if err := c.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
-		event("io_error", nil)
+		connectionEvent("io_error", nil)
 		return
 	}
 	server, err := srp.NewServer(record, nil)
 	if err != nil {
-		event("invalid_record", nil)
+		connectionEvent("invalid_record", nil)
 		return
 	}
 	var envelope *channel.Channel
 	if rsaKey != nil {
-		version, e := wire.ReadFrame(c, 4096)
-		if e != nil || len(version) != 4 || binary.LittleEndian.Uint32(version) != bootstrap.Version {
-			event("rejected", map[string]any{"reason": "bootstrap"})
+		var diagnostics map[string]any
+		envelope, diagnostics, err = bootstrapChannel(c, rsaKey)
+		if err != nil {
+			name := "rejected"
+			if diagnostics["stage"] == "version_frame" && errors.Is(err, io.EOF) {
+				name = "connection_closed"
+			} else {
+				diagnostics["reason"] = "bootstrap"
+			}
+			connectionEvent(name, diagnostics)
 			return
 		}
-		request, e := wire.ReadFrame(c, 4096)
-		if e != nil {
-			event("rejected", map[string]any{"reason": "bootstrap"})
-			return
-		}
-		_, material, e := bootstrap.Decode(rsaKey, request)
-		if e != nil {
-			event("rejected", map[string]any{"reason": "bootstrap"})
-			return
-		}
-		// RvROLClient passes the same RSession buffer twice to CChannel, whose
-		// constructor uses the first 32 bytes of each supplied buffer.
-		envelope, e = channel.New(material[:32], material[:32])
-		for i := range material {
-			material[i] = 0
-		}
-		if e != nil {
-			event("invalid_channel_config", nil)
-			return
-		}
-		reply := make([]byte, 4)
-		binary.LittleEndian.PutUint32(reply, bootstrap.Version)
-		if wire.WriteFrame(c, reply, 4096) != nil {
-			event("write_error", nil)
-			return
-		}
+		connectionEvent("bootstrap_complete", nil)
 	}
 	if encKey != nil {
 		envelope, err = channel.New(encKey, decKey)
 		if err != nil {
-			event("invalid_channel_config", nil)
+			connectionEvent("invalid_channel_config", nil)
 			return
 		}
 	}
 	for i := 0; i < 3; i++ {
 		input, err := wire.ReadFrame(c, 4096)
 		if err != nil {
-			event("read_error", nil)
+			connectionEvent("read_error", nil)
 			return
 		}
 		if envelope != nil {
 			input, err = envelope.Decrypt(input)
 			if err != nil {
-				event("rejected", map[string]any{"reason": "channel"})
+				connectionEvent("rejected", map[string]any{"reason": "channel"})
 				return
 			}
 		}
@@ -113,24 +108,24 @@ func serve(c net.Conn, record srp.Record, encKey, decKey []byte, rsaKey *rsa.Pri
 			if errors.Is(err, srp.ErrAuthentication) {
 				reason = "authentication"
 			}
-			event("rejected", map[string]any{"reason": reason})
+			connectionEvent("rejected", map[string]any{"reason": reason})
 			return
 		}
 		if envelope != nil {
 			output, err = envelope.Encrypt(output)
 			if err != nil {
-				event("channel_error", nil)
+				connectionEvent("channel_error", nil)
 				return
 			}
 		}
 		if err = wire.WriteFrame(c, output, 4096); err != nil {
-			event("write_error", nil)
+			connectionEvent("write_error", nil)
 			return
 		}
 		if done {
 			key, err := server.SessionKey()
 			if err != nil || len(key) != 40 {
-				event("key_error", nil)
+				connectionEvent("key_error", nil)
 				return
 			}
 			if postAuth.echo || postAuth.keepalive || postAuth.loginEndpoint != "" || postAuth.controlCode != nil {
@@ -140,42 +135,42 @@ func serve(c net.Conn, record srp.Record, encKey, decKey []byte, rsaKey *rsa.Pri
 				key[j] = 0
 			}
 			if err != nil {
-				event("key_error", nil)
+				connectionEvent("key_error", nil)
 				return
 			}
-			event("authentication_complete", nil)
+			connectionEvent("authentication_complete", nil)
 			if postAuth.echo {
 				if err = echoRecord(c, envelope); err != nil {
-					event("post_auth_rejected", nil)
+					connectionEvent("post_auth_rejected", nil)
 					return
 				}
-				event("post_auth_echo_complete", nil)
+				connectionEvent("post_auth_echo_complete", nil)
 			}
 			if postAuth.loginEndpoint != "" {
 				if err = loginRecord(c, envelope, postAuth.loginEndpoint); err != nil {
-					event("login_record_rejected", nil)
+					connectionEvent("login_record_rejected", nil)
 					return
 				}
-				event("login_record_complete", nil)
+				connectionEvent("login_record_complete", nil)
 			}
 			if postAuth.keepalive {
 				if err = keepaliveRecord(c, envelope); err != nil {
-					event("keepalive_rejected", nil)
+					connectionEvent("keepalive_rejected", nil)
 					return
 				}
-				event("keepalive_complete", nil)
+				connectionEvent("keepalive_complete", nil)
 			}
 			if postAuth.controlCode != nil {
 				if err = controlRecord(c, envelope, *postAuth.controlCode); err != nil {
-					event("control_rejected", nil)
+					connectionEvent("control_rejected", nil)
 					return
 				}
-				event("control_error_sent", nil)
+				connectionEvent("control_error_sent", nil)
 			}
 			return
 		}
 	}
-	event("incomplete", nil)
+	connectionEvent("incomplete", nil)
 }
 
 // echoRecord exchanges one bounded synthetic record after authenticated rekeying.
@@ -430,7 +425,7 @@ func run() error {
 		return err
 	}
 	defer listener.Close()
-	event("listening", map[string]any{"address": listener.Addr().String(), "channel_enabled": encKey != nil || rsaKey != nil, "rsa_bootstrap": rsaKey != nil})
+	event("listening", map[string]any{"address": listener.Addr().String(), "channel_enabled": encKey != nil || rsaKey != nil, "rsa_bootstrap": rsaKey != nil, "rsa_public_key_sha256": rsaPublicFingerprint(rsaKey)})
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	return serveListener(ctx, listener, *maxConnections, *once, func(c net.Conn) {

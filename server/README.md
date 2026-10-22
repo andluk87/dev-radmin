@@ -33,6 +33,19 @@ docker logs --tail 100 radmin-own-key-control-1
 docker compose -p radmin-own-key down
 ```
 
+Для обновления уже настроенного контейнера выполните `git pull --ff-only`
+из корня репозитория и снова запустите `start.sh` с теми же переменными.
+Повторно расшифровывать ключ не требуется.
+
+Журнал содержит время UTC и `connection_id`. Пустое TCP-подключение
+(`Test-NetConnection`) завершается событием `connection_closed` с
+`stage=version_frame`, `error_kind=eof`; это не проверка протокола Radmin.
+`bootstrap_complete` означает успешный RSA-обмен. При `rejected/bootstrap`
+поля `stage` и `error_kind` показывают этап отказа; `rsa_decode` означает,
+что сервер получил RSA-блок нужной длины, но не принял его. Событие
+`listening` также содержит SHA-256 публичного ключа для сверки с клиентом.
+Содержимое сообщений и ключи в этот журнал не записываются.
+
 Пара соответствует клиентскому ZIP с SHA-256
 `18c18b8fffe8416543b3c2adf55fc35511882d096324e92c1b69d9591c28c343`.
 Серверный публичный ключ имеет SPKI SHA-256

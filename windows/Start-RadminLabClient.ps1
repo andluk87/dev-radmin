@@ -73,7 +73,17 @@ if ($outputFull.Equals($installFull, [StringComparison]::OrdinalIgnoreCase) -or
     throw 'OutputDirectory must be outside the original installation.'
 }
 # Check runtime conditions before creating any staging files.
+$isElevated = $false
+$powerOn = $null
 if ($RunOnDedicatedTestMachine) {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    try {
+        $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+        $isElevated = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    } finally { $identity.Dispose() }
+    if (-not $isElevated) {
+        throw 'Open PowerShell as Administrator. The native /run client opens its HKLM settings with write access.'
+    }
     $running = @(Get-CimInstance Win32_Service | Where-Object {
         ($_.Name -eq 'RvControlSvc' -or $_.PathName -match 'RvControlSvc\.exe') -and $_.State -ne 'Stopped'
     })
@@ -91,6 +101,11 @@ if ($RunOnDedicatedTestMachine) {
         $address = [string]$key.GetValue('ServerAddress',$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
         if (-not $address.Equals($ExpectedServerAddress,[StringComparison]::OrdinalIgnoreCase)) {
             throw 'ServerAddress does not match ExpectedServerAddress. This script never changes the registry.'
+        }
+        if ($key.GetValueNames() -contains 'PowerOn') {
+            if ($key.GetValueKind('PowerOn') -eq [Microsoft.Win32.RegistryValueKind]::DWord) {
+                $powerOn = $key.GetValue('PowerOn')
+            }
         }
     } finally { if ($key) {$key.Dispose()}; if ($base) {$base.Dispose()} }
 }
@@ -113,6 +128,8 @@ $report = [ordered]@{
     Executed = $false
     IsolatedProfile = $false
     VPNReady = $false
+    IsElevated = $isElevated
+    PowerOn = $powerOn
 }
 Write-Host ('Staged own-key client: ' + $outputFull)
 Write-Host 'The modified EXE has an invalid vendor signature. Windows trust policies remain enabled.'
@@ -122,6 +139,16 @@ if ($RunOnDedicatedTestMachine) {
     $report.Executed = $true
     $report.ProcessId = $process.Id
     Write-Host ('Started /run process: ' + $process.Id)
+    Start-Sleep -Seconds 2
+    $process.Refresh()
+    $report.RunningAfterTwoSeconds = -not $process.HasExited
+    if ($process.HasExited) {
+        $report.ExitCode = $process.ExitCode
+        Write-Warning ('Client exited during startup. Exit code: ' + $process.ExitCode)
+    } else {
+        Write-Host ('Client is still running after two seconds. PID: ' + $process.Id)
+    }
+    if ($null -ne $powerOn) { Write-Host ('PowerOn (Registry32): ' + $powerOn) }
 } else {
     Write-Host 'Staging complete. No EXE was started and no service or registry setting was changed.'
 }
